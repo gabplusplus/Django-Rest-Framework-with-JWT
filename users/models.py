@@ -11,6 +11,7 @@ from django.core.mail import send_mail
 
 class CustomAccountManager(BaseUserManager):
 
+    # Creating superuser and returns create user
     def create_superuser(self, email, user_name, first_name, password, **other_fields):
 
         other_fields.setdefault('is_superuser', True)
@@ -28,6 +29,7 @@ class CustomAccountManager(BaseUserManager):
         
         return self.create_user(email, user_name, first_name, password, **other_fields)
 
+    # Creating user (also called in RegisterUserSerializer in serializers.py)
     def create_user(self, email, user_name, first_name, password, **other_fields):
 
         if not email:
@@ -46,6 +48,7 @@ def validate_number(value):
     if not ph_number_pattern.match(value):
         raise ValidationError("Invalid Philippine mobile number")
 
+
 class NewUser(AbstractBaseUser, PermissionsMixin):
 
     email = models.EmailField(_('email address'), unique=True)
@@ -56,16 +59,18 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     start_date = models.DateTimeField(default=timezone.now)
     is_staff = models.BooleanField(default=True)
     
+    #Called in serializers.py to perform create user
     objects = CustomAccountManager()
 
+    #email is set as the username field in login
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['user_name', 'first_name', 'last_name', 'mob_num']
-
 
 
     def __str__(self):
         return self.user_name
 
+# Function to reset password and send email to console
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
 
@@ -73,7 +78,7 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
 
     send_mail(
         # title:
-        "Password Reset for {title}".format(title="Some website title"),
+        "Password Reset for {title}".format(title="Logins"),
         # message:
         email_plaintext_message,
         # from:
