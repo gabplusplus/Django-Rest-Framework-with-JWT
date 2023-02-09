@@ -40,7 +40,7 @@ class CustomAccountManager(BaseUserManager):
         return user
 
 
-
+# Validate the number if Philippine number
 def validate_number(value):
     ph_number_pattern = re.compile(r'^(09|639)\d{9}$') # r'^(09|\+639)\d{9}$' with +
     if not ph_number_pattern.match(value):
